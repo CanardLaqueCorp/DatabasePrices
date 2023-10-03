@@ -27,14 +27,18 @@ def getAvgData(brand, model) :
     if (len(res) == 0):
         return None
     avgPrice = 0
+    avgPriceEuro = 0
     avgMileage = 0
     for car in res:
         avgPrice += float(car['price'])
+        avgPriceEuro += float(car['priceEuro']) 
         avgMileage += float(car['mileage'])
     avgPrice /= len(res)
+    avgPriceEuro /= len(res)
     avgMileage /= len(res)
     return {
         'avgPrice': round(avgPrice),
+        'avgPriceEuro': round(avgPriceEuro),
         'avgMileage': round(avgMileage),
         'cars' : res
     }
@@ -66,11 +70,20 @@ with open('data/prices.csv', 'r', encoding="utf8") as csv_file:
 
         mileage = line[10].replace(' km', '')
 
+        # convert price to euro
+        
+        # $
+        price = line[1]
+
+        # €
+        priceEuro = str(round(float(price) * 0.95, 0))
+
         carPrice = {
             'brand': line[3],
             'model': line[4],
             'year': line[5],
-            'price': line[1],
+            'price': price,
+            'priceEuro': priceEuro,
             'mileage': mileage,
         }
 
@@ -86,10 +99,11 @@ for car in carsDb:
     if (avgData == None):
         continue
     car['avgPrice'] = avgData['avgPrice']
+    car['avgPriceEuro'] = avgData['avgPriceEuro']
     car['avgMileage'] = avgData['avgMileage']
 
     for carPrice in avgData['cars']:
-        scriptCarPrices += "INSERT INTO car_price (car_id, price, mileage, year) VALUES (" + str(car['id']) + ", " + carPrice['price'] + ", " + carPrice['mileage'] + ", " + carPrice['year'] + ");\n"
+        scriptCarPrices += "INSERT INTO car_price (car_id, price, price_euro, mileage, year) VALUES (" + str(car['id']) + ", " + carPrice['price'] + ", " + carPrice['priceEuro'] + ", " + carPrice['mileage'] + ", " + carPrice['year'] + ");\n"
 
 
 # move the files from the "exports" directory to the "old_exports" directory
@@ -102,7 +116,7 @@ for file in os.listdir('exports'):
 script = ""
 for car in carsDb :
     if (car['avgPrice'] != 0):
-        script += "UPDATE car_th SET price_used = " + str(car['avgPrice']) + " WHERE id = " + str(car['id']) + ";\n"
+        script += "UPDATE car_th SET price_used = " + str(car['avgPrice']) + " price_used_euro = " + str(car['avgPriceEuro']) + " WHERE id = " + str(car['id']) + ";\n"
 
 # We create the file
 
