@@ -116,7 +116,7 @@ for file in os.listdir('exports'):
 script = ""
 for car in carsDb :
     if (car['avgPrice'] != 0):
-        script += "UPDATE car_th SET price_used = " + str(car['avgPrice']) + " price_used_euro = " + str(car['avgPriceEuro']) + " WHERE id = " + str(car['id']) + ";\n"
+        script += "UPDATE car_th SET price_used = " + str(car['avgPrice']) + ", price_used_euro = " + str(car['avgPriceEuro']) + " WHERE id = " + str(car['id']) + ";\n"
 
 # We create the file
 
